@@ -1,0 +1,23 @@
+#!/usr/bin/octave -q
+
+page_screen_output(0);
+page_output_immediately(1);
+if (length(argv()) < 2)
+   printf("usage:\n%s image_source image_dest",program_name ());
+   exit(0);
+endif
+source = argv(){1};
+dest =argv(){2};
+printf("create a distance map from %s to %s\n", source, dest);
+
+img = imread(source); % Read from file
+img = double(img);               % Convert to double
+if size(img,3) > 1
+    img = img(:,:,1);            % Convert to grayscale if RGB
+end
+img = img - min(min(img));       % Map darkest black to 0
+img = img / max(max(img));       % Map brightest white to 1
+imageInfo = imfinfo(source);     % Get Info
+
+dist = makedisttex(img, imageInfo.Width/4, imageInfo.Height/4); % No size reduction needed
+imwrite(distquant(dist), dest);

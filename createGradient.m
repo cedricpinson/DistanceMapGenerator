@@ -1,0 +1,14 @@
+I = imread ("source.png");
+size = 100;
+f_gauss = fspecial("gaussian", size, size/3.0);
+S = imfilter(I, f_gauss, "symmetric");
+imwrite (S,"smooth.png");
+S = im2double(S);
+%S = S/max(max(S));
+[Dx, Dy] = gradient(S*1.0);
+maxdx = max(max(Dx));
+maxdy = max(max(Dy));
+maxfinal = 1.0;
+maxfinal = max(maxdy, maxdx);
+imwrite (Dx/maxfinal,"dx.png");
+imwrite (Dy/maxfinal,"dy.png");

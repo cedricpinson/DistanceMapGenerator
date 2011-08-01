@@ -1,0 +1,31 @@
+#!/usr/bin/octave -q
+
+page_screen_output(0);
+page_output_immediately(1);
+if (length(argv()) < 2)
+   printf("usage:\n%s image_source image_dest_basename",program_name ());
+   exit(0);
+endif
+source = argv(){1};
+destx = strcat(argv(){2},"_dx.png");
+desty = strcat(argv(){2},"_dy.png");
+printf("create a gradient maps from %s to %s %s\n", source, destx, desty);
+
+I = imread (source);
+size = 50;
+f_gauss = fspecial("gaussian", size, size/3.0);
+S = imfilter(I, f_gauss, "symmetric");
+imwrite (S, "/tmp/smooth.png");
+S = im2double(S);
+%S = S/max(max(S));
+[Dx, Dy] = gradient(S*1.0);
+
+minfinal = min( min(min(Dx)), min(min(Dy)));
+maxfinal = max( max(max(Dx)), max(max(Dy)));
+printf("range min %f %f\n",minfinal, maxfinal);
+dist = maxfinal-minfinal;
+Dx = (Dx - minfinal)/dist;
+Dy = (Dy - minfinal)/dist;
+
+imwrite (Dx,destx);
+imwrite (Dy,desty);
